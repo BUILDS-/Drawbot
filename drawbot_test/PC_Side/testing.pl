@@ -18,6 +18,13 @@ close (FILE);
 $pixels =sqrt( length $bitstream);
 $port->write($pixels);
 my $count = 0;
+my $count2 = 0;
+while (count2=0){
+  sleep(1);
+  $current=$pixels;
+  my $count_out = $port->write($current);
+  $count2++;
+}
  while (1) {
     # Poll to see if any data is coming in
     my $char = $port->lookfor();
