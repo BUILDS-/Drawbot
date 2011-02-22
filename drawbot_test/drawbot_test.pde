@@ -13,43 +13,63 @@
 AF_Stepper motorx(48, 1);  //motor1 (48steps per revolution [7.5 degree] (port1)(controlling x axis)
 AF_Stepper motory(48,2);  // motor 2 same as above port 2, control y axis
 // still need laser control, I can add that later when we get all parts, probably just with digitalWrite easy. 
-char image[]="0010001100101101000110101" //will convert image to a string in matlab, script for that mostly done
-//this image stuff is probably better off loaded from an SD card or something so that arduino doesnt need reprogramming every time we make a new picture
-//there are sd card breakout stuff, like $10, so should be easily doable
+
 int killSwitch 3;  //flip to start/stop
 int countx=0; //set up our counters
 int county=0;
-int currentPixel=0;
-int imageSize=5;   //here we assume a 5x5 pixel "image" which is terribly stupid, but I have no idea how we will need to gear the etch-a-sketch for good resolution, so bear with it
+int imageSize;   //will get assigned later
+
+char incomingByte;              // for incoming serial data
+char bitstream;
+int count = 0;
+
 
 void setup() {
-  Serial.begin(9600); // set up Serial library at 9600 bps
+  Serial.begin(19200); // set up Serial library at 9600 bps
   Serial.println("BUILDS cnc laser drawbot");
   motor.setSpeed(10); // 10 rpm
 }
 
 void loop() {
   while (digitalRead(killSwitch) == HIGH) {  //only go if a killswitch is switched on
+  if (Serial.available() > 0)  // gets the image size
+  {
+    imageSize=Serial.read()
+    Serial.print(imageSize);
+  }
 
   for (county=0;county<imageSize;county++){  //y direction counter/moving
     if (county%2==0) { // should we go left or right?
       for (countx=0;countx<imageSize;countx++)
       {
-        if (image[currentPixel]=="1"){
+	if (Serial.available () > 0)
+	{
+	   incomingByte = Serial.read ();
+	   //store it as a charmander
+	   bitstream=incomingByte;
+	   Serial.print(bitstream);
+	}
+	   
+        if (bitstream=="1"){
           //fire laser
         }
         motorx.step(100,FORWARD,SINGLE);
-        currentPixel++;
       }
     }
     else if (county%2==1) {
       for (countx=imageSize;countx>0;countx--)
       {
-        if (image[currentPixel]=="1"){
+	if (Serial.available() > 0)
+	{
+	  incomingByte=Serial.read();
+	  //store it as a charmelion
+	  bitstream=incomingByte;
+	  Serial.print(bitstream);
+	}
+        if (bitstream=="1"){
           //fire laser
         }
         motorx.step(100,BACKWARD,SINGLE);
-        currentPixel++;
       }
     }
     else 
@@ -58,7 +78,6 @@ void loop() {
      break;
     }
     motory.step(100,FORWARD,SINGLE);
-    currentpixel++;
   }
   Serial.println("FINISHED, WILL NOW BREAK LOOP AND STOP LASER");
   //turn off laser
@@ -67,9 +86,15 @@ void loop() {
   {
     motory.step(100,BACKWARD,SINGLE);
   }
-  for (int ii=0;ii<imageSize;ii++)
+  if (imageSize%2==0)
   {
-    motorx.step(100,BACKWARD,SINGLE);
+    Serial.println("that was nice");
+  }
+  else {
+    for (int ii=0;ii<imageSize;ii++)
+    {
+      motorx.step(100,BACKWARD,SINGLE);
+    }
   }
   break;
   }
