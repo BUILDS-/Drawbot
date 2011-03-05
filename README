@@ -1,6 +1,14 @@
 Drawbot software for BUILDS CNC machine.
 
-Currently (as of 2/22/11) under heavy development.  
+.pde file goes to arduino
+
+.sh, .txt, .pl files belong in same folder, .m file is for matlab to generate the .txt file from images
+
+this uses the Adafruit motor shield, big thanks to ladyada for her shield and code for controlling the steppers.
+
+
+
+Currently (as of 3/04/11) under heavy development.  
 See wiki for more info
 http://builds.cc/wiki/index.php?title=CNC_Drawbot
 
