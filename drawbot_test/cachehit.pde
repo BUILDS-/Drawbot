@@ -52,7 +52,7 @@ int intcreator(char gsize){  //some magic turning the size to an integer
 char nextchar() {   // take a peek at the next value over serial
   while(Serial.available()==0) {
   } // wait till next char is available
-  char ch=Serial.peek();
+  char ch=Serial.read();
   //Serial.print(ch,DEC);
   Serial.print(ch);
   return ch;
@@ -98,6 +98,7 @@ Serial.print(pixels);
     {
       for (int countx=0;countx<pixels;countx++)
       {
+        
         char location=nextchar();
         if (location=='1')
         {
@@ -105,6 +106,7 @@ Serial.print(pixels);
         }
     
         motor.step(stepsize,FORWARD,INTERLEAVE);
+        Serial.print("moved");
 
         delay(delays);
       }
@@ -120,11 +122,13 @@ Serial.print(pixels);
         }
         
         motor.step(stepsize,BACKWARD,SINGLE);
+        Serial.print("moved");
 
         delay(delays);
       }
     }
-    motor2.step(stepsize,BACKWARD,SINGLE);       // Note there will be an extra drop down to account for
+    motor2.step(stepsize,BACKWARD,SINGLE);    // Note there will be an extra drop down to account for
+    Serial.print("moved");
     delay(delays);
     }
     
@@ -189,5 +193,4 @@ Serial.print(pixels);
 //
 //  motor2.step(100, FORWARD, MICROSTEP);
 //  motor2.step(100, BACKWARD, MICROSTEP);
-
 
