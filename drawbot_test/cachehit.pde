@@ -76,6 +76,7 @@ int numpix=intcreator(pixchar); // wow what am I doing
 Serial.print("hello3");
 Serial.print(int(numpix));
 pixels=int(numpix); //magic, its the pixels!
+pixels=pixels-1; //fixes a counting error, we had 1 too many steps per row and 1 too many columns due to this
 Serial.print(pixels); 
 
   // ----------- STROKE MODE --------------------
