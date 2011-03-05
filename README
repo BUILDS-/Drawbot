@@ -1,16 +1,31 @@
 Drawbot software for BUILDS CNC machine.
 
-.pde file goes to arduino
+>>drawbot.pde file goes to arduino
 
-.sh, .txt, .pl files belong in same folder, .m file is for matlab to generate the .txt file from images
+>>drawbot.sh, drawbot1.txt, pixelsize.pl, bitstream.pl files belong in same folder
 
-this uses the Adafruit motor shield, big thanks to ladyada for her shield and code for controlling the steppers.
+>>drawbotBitStream.m file is for matlab to generate the drawbot1.txt file from images
+
+NOTE: currently this uses functions that are not supported in GNU Octave.  While not a priority for the time being, we plan on having the entire project using free software, as matlab is not widely avaiable for people wishing to replicate our efforts.
+
+==WHAT EACH FILE DOES==
+drawbot1.txt - this file contains the bitstream sent from the PC to the arduino, it consist of 1 and 0, representing black and white pixels.  the arduino interprates that if it wants to fire the laser (black) or not (white)
+pixelsize.pl - this file reads in drawbot1.txt, finds out how long it is, then square roots it.  because each image is a square, this works.  Then it will send this integer to the arduino.  arduino will now know when each new line starts!
+bitstream.pl - takes in drawbot1.txt, reads one char at a time into the arduino.  that way arduino will know to burn or not.
+drawbot.sh - runs pixelsize and bitstream, not necessacary, but makes the machine operator's life easier
+drawbot.pde - arduino's software, takes in data from the perl scripts to move motors and fire laser
+drawBotBitStream.m - MATLAB program takes in a picture, converts it to the drawbot1.txt, does some fancy image processing to do this
+=======================
 
 
+>>this uses the Adafruit motor shield, big thanks to ladyada for her shield and code for controlling the steppers.
 
-Currently (as of 3/04/11) under heavy development.  
+
+========PROJECT STATUS========
+Currently (as of 3/05/11) under heavy development.  
 See wiki for more info
 http://builds.cc/wiki/index.php?title=CNC_Drawbot
+==============================
 
 for any questions, email me (jeff) 
 

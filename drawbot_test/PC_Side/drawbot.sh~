@@ -7,4 +7,4 @@ perl pixelsize.pl
 sleep 1
 
 #send over each bit of the bitstream
-perl bitstream.pl
+perl herp.pl
