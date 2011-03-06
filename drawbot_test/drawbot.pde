@@ -1,94 +1,87 @@
-#include <AFMotor.h>  
-//^^ ladyada's great moto shield library
+#include <AFMotor.h>
 
 
-AF_Stepper motor(48, 1); //sets up motor1 (x axis)
-AF_Stepper motor2(48, 2); //set up motor2 (y axis)
+AF_Stepper motor(48, 1); //sets up motor1
+AF_Stepper motor2(48, 2); //set up motor2
 
-int stepsize=50;  //this will change depending on our gearing
-int delays=1000; //this will change depending on the time needed to burn 
+int stepsize=5;
+int delays=1;
+int burndelay=5;
 
-int ledPin=14; //debug, will not be used in final
-
-//all analogue pins (can be used as digital) and ditial pins are available for the laser
+int ledPin=14;
 
 
 
 void setup() {
   Serial.begin(9600);           // set up Serial library at 9600 bps
-  Serial.println("BUILDS Drawbot");
-
-
-  motor.setSpeed(200);  // fastest is 255, we have to adjust these to get good performance and time 
-
-
-  motor2.setSpeed(200);  // same as above ^^
-  
-  
-  delay(delays); 
-  
-  pinMode(ledPin, OUTPUT);  //wont be used in final, just for debugging
-
+  Serial.println("I'm-a Chargin' mah laser!");
+  motor.setSpeed(200);  
+  motor2.setSpeed(200);    
+  pinMode(ledPin, OUTPUT);
 }
 
 
-char getsize() {  //pixelsize.pl sends the size over serial, don't worry about it drawbot.sh handles that
-  while(Serial.available()==0) {
-  } // wait till next char is available
-  char sz=Serial.read();
 
-  return sz;
-}
 
-int intcreator(char gsize){  //some magic turning the size to an integer
-  char *zs = &gsize;
-  int sizes=int(atoi(zs));
-//  Serial.print(sizes);
-  return sizes;
+int getsize() {    //pixelsize.pl sends the size over serial, don't worry about it drawbot.sh handles that
+
+  // Current support is for ONLY THREE DIGIT NUMBERS
+
+  while(Serial.available()==0) {}
+  int sz100=int(Serial.read()) - 48; // Converts to a decimal digit for the hundreds place
+  
+  while(Serial.available()==0) {}
+  int sz10=int(Serial.read()) - 48;   // Converts to a decimal digit for the tens place
+
+  while(Serial.available()==0) {}
+  int sz1=int(Serial.read()) - 48;    // Converts to a decimal digit for the units place
+  
+  int gsize=sz100*100+sz10*10+sz1;    // MULTIPLYING by orders of 10 to assign relative magnitudes
+
+  Serial.print("the size of this file is ");
+  
+  
+  
+  return gsize;
+  
 }
   
-char nextchar() {   // take a peek at the next value over serial, we get this from bitstream.pl
+char nextchar() {   // take a peek at the next value over serial
   while(Serial.available()==0) {
   } // wait till next char is available
   char ch=Serial.read();
-  //Serial.print(ch,DEC);
-  Serial.print(ch);
+  Serial.print("the next char is ");
+  Serial.println(ch);
+  
   return ch;
 }
 
-void lightup(int location) {  //will eventually be replaced with burnation for laser
-  if (location==1){
-    digitalWrite(ledPin,HIGH);
-    delay(delays);
-    digitalWrite(ledPin,LOW);
-  }
-  else if (location==0){
-    delay(delays);}
-  else{
-    delay(delays);}
+
+void lightup() {  //will eventually be replaced with burnation for laser
+
+  digitalWrite(ledPin,HIGH);
+  delay(delays);
+  digitalWrite(ledPin,LOW);
 }
 
 
 
 void loop() {  // main program
-Serial.println("Jeff Crowell; Samir Ahmed - 2011"); // 1sted
-int pixels; 
-char pixchar=int(getsize()); //get the size of the pixels
+Serial.println("BUILDS Drawbot - Jeff Crowell; Samir Ahmed"); // 1sted
+int pixels=getsize(); 
 
-int numpix=intcreator(pixchar); // wow what am I doing
 
-Serial.print(int(numpix));
-pixels=int(numpix); //magic, its the pixels!
-pixels=pixels-1; //fixes a counting error, we had 1 too many steps per row and 1 too many columns due to this
-//Serial.print(pixels); 
+Serial.println(pixels); 
 
   // ----------- STROKE MODE --------------------
   
   /*Moving foward on
          x----pixels->     // Will move forward (pixels) steps
+         
                        y   
-                       |   // Will move downwards 1 step
-                       v
+                       |   // Will move do
+                       wnwards 1 step
+                      v
          <----pixels--x    // Will move backwards 1 step
         y
         |
@@ -96,51 +89,75 @@ pixels=pixels-1; //fixes a counting error, we had 1 too many steps per row and 1
          x----pixels->        
   */
   
-  for (int county=0;county<pixels+1;county++)
+  for (int county=0;county<pixels;county++)
   {
+    
     if ((county%2)==0) //we should go l-r
     {
-      for (int countx=0;countx<pixels;countx++)
+      for (int countx=0;countx<pixels-1;countx++)
       {
-        
+        if (countx==0){       
         char location=nextchar();
-        char *loca = &location;
-        int bits=int(atoi(loca));
-        lightup(bits);
+        if (location=='1')
+        {
+          lightup();
+        }
+        }
+    
         motor.step(stepsize,FORWARD,INTERLEAVE);
-        Serial.println("moved right");
+        Serial.println("moved x >");
+        char 
+        
+        location=nextchar();
+        
+        
+        if (location=='1')
+        {
+          lightup();
+        }
 
         delay(delays);
       }
     }
     else //we should go r-l
     {
-      for(int countx=0;countx<pixels;countx++)
+      for(int countx=0;countx<pixels-1;countx++)
       {
+        if (countx==0){          
+          char location=nextchar();
+          if (location=='1')
+          {
+            lightup();
+
+          }                      
+        }    
+        motor.step(stepsize,BACKWARD,INTERLEAVE);
+        Serial.println("moved x <");
+        
         char location=nextchar();
-        char *loca = &location;
-        int bits=int(atoi(loca));
-        lightup(bits);
-        motor.step(stepsize,BACKWARD,SINGLE);
-        Serial.println("moved left");
+        if (location=='1')
+        {
+          lightup();
+        }
 
         delay(delays);
       }
     }
     motor2.step(stepsize,BACKWARD,SINGLE);    // Note there will be an extra drop down to account for
-    Serial.println("moved down");
+    Serial.println("moved y v");
     delay(delays);
     }
     
     // ------------------ RETURN TO CENTER --------------------
     // Overshoot the start point so we can move back into position without backlash
     
-    Serial.println("RETURNING TO INITIAL POSITION");
+    
     // Ideally step size is one and pixels is the step to return home
+    Serial.println("returning to home");
     motor2.step((pixels*stepsize+6),FORWARD,SINGLE);          // Overshoot by 5 places (1 from extra and 5 overshoots)
     motor2.step(5,BACKWARD,SINGLE);                           // Move back 5
    
-    if ((pixels%2)==0)
+    if ((pixels%2)==1)
     {
       motor.step(5,FORWARD,SINGLE);                           // Moves Forwards 5 MAKE FUCNTION CALLED BACKLASH
       motor.step((pixels*stepsize+10),BACKWARD,SINGLE);       // Overshoot by 5
@@ -148,7 +165,10 @@ pixels=pixels-1; //fixes a counting error, we had 1 too many steps per row and 1
     }
     
     // -------------------- RELEASE STEPPER --------------------
+    
     motor.release();
     motor2.release();
     exit(0);
 }
+
+

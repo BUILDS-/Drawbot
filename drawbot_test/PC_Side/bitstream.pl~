@@ -22,7 +22,7 @@ my $count = 1;
 while (count < (length $bitstream))
 {
 #give the arduino a chance to catch up
-usleep 10000;
+usleep(10000);
 #grab the next char
 $current=substr $bitstream,$count,1;
 #send it over to arduino
