@@ -22,7 +22,8 @@ drawBotBitStream.m - MATLAB program takes in a picture, converts it to the drawb
 
 
 ========PROJECT STATUS========
-Currently (as of 3/05/11) under heavy development.  
+Currently (as of 3/07/11) under heavy development. 
+Software is mostly complete.  Hardware needs some doing 
 See wiki for more info
 http://builds.cc/wiki/index.php?title=CNC_Drawbot
 ==============================
